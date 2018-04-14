@@ -2,12 +2,12 @@
 var Enemy = function() {
     // 要应用到每个敌人的实例的变量写在这里
     // 我们已经提供了一个来帮助你实现更多
-    this.yRange = [0,250];
-    this.xRange = [-200,0];
-    this.speedRange = [50,250];
+    this.offset = 60;   // 偏移图片Y轴，使之处于格子正中央
+    this.xRange = [-100,0]; // 随机的出现地点范围
+    this.speedRange = [50,300]; // 随机的速度
     this.x = this.xRange[0] + Math.round(Math.random() * (0 - this.xRange[1]));
-    this.y = this.yRange[0] + Math.round(Math.random() * (this.yRange[1] - 0));
-    this.dis = this.speedRange[0] + Math.round(Math.random() * (this.speedRange[1] - 0));
+    this.y = Math.round(Math.random() * 2) * 83 + this.offset;  //随机的出现地点范围
+    this.dis = this.speedRange[0] + Math.round(Math.random() * (this.speedRange[1] - 0));   //随机的移动步距
 
     // 敌人的图片，用一个我们提供的工具函数来轻松的加载文件
     this.sprite = 'images/enemy-bug.png';
@@ -19,6 +19,15 @@ Enemy.prototype.update = function(dt) {
     // 你应该给每一次的移动都乘以 dt 参数，以此来保证游戏在所有的电脑上
     // 都是以同样的速度运行的
     this.x += dt * this.dis;
+
+    // 如果超出了屏幕，先把该实例从敌人列表中去掉，再画一个新的
+    if (this.x > 505) {
+        let index = allEnemies.indexOf(this);
+        allEnemies.splice(index,1);
+        let enemy = new Enemy();
+        allEnemies.push(enemy);
+    }
+
 };
 
 // 此为游戏必须的函数，用来在屏幕上画出敌人，
@@ -29,26 +38,50 @@ Enemy.prototype.render = function() {
 // 现在实现你自己的玩家类
 // 这个类需要一个 update() 函数， render() 函数和一个 handleInput()函数
 var Player = function(){
+    // this.offset = 40;
     this.x = 200;
-    this.y = 420;
+    this.y = 400;
     this.sprite = 'images/char-boy.png';
+    this.disY = 83; // x轴移动步距
+    this.disX = 101;// y轴移动步距
+    this.position = [2,5]; //当前所处格子
 }
 
+// 玩家是否成功抵达终点
 Player.prototype.update = function(){
-
+    if (this.position[1] == 0) {
+        player = new Player();
+    }
 }
 
 Player.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
+// 根据键盘输入的指令，移动人物
 Player.prototype.handleInput = function(direction){
     switch (direction)
     {
-        case 'left':this.x -= 50;break;
-        case 'right':this.x += 50;break;
-        case 'up':this.y -= 50;break;
-        case 'down':this.y += 50;break;
+        case 'left':
+            if (this.position[0] > 0) {
+                this.x -= this.disX;this.position[0]--;
+            }
+            break;
+        case 'right':
+            if (this.position[0] < 4) {
+               this.x += this.disX;this.position[0]++; 
+            }
+            break;
+        case 'up':
+            if (this.position[1] > 0) {
+                this.y -= this.disY;this.position[1]--;
+            }
+            break;
+        case 'down':
+            if (this.position[1] < 5) {
+                this.y += this.disY;this.position[1]++;
+            }
+            break;
     }
 }
 

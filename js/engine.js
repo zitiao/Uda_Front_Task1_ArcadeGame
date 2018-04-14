@@ -64,8 +64,22 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
+
+    /* 碰撞检测函数
+     */
+     function checkCollisions(){
+        // 这里的碰撞检测实际是检查虫子和玩家是否在一个格子里面。
+        allEnemies.forEach(function(enemy) {
+            let bugPosition = [0,0];
+            bugPosition[0] = parseInt(enemy.x / 101);
+            bugPosition[1] = parseInt((enemy.y - enemy.offset)/ 83 + 1);
+            if (bugPosition[0] == player.position[0] && bugPosition[1] == player.position[1] ) {
+                reset();
+            }
+        });
+     }
 
     /* 这个函数会遍历在 app.js 定义的存放所有敌人实例的数组，并且调用他们的 update()
      * 函数，然后，它会调用玩家对象的 update 方法，最后这个函数被 update 函数调用。
@@ -129,6 +143,7 @@ var Engine = (function(global) {
      */
     function reset() {
         // 空操作
+        player = new Player();
     }
 
     /* 紧接着我们来加载我们知道的需要来绘制我们游戏关卡的图片。然后把 init 方法设置为回调函数。
